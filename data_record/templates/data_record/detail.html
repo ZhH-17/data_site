@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<style>
+ img {width: "300"}
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'data_record/style.css' %}" />
+<h1>Data index {{record.index}}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<div >
+    {% if record.exist == 1 %}
+    <p>
+        Data recorded time {{ record.data_time}}
+        Calibrated with wavelength in {{record.wl_start}} ~ {{record.wl_end}} and step {{record.wl_step}}
+        Uploaded by {{ record.operator }} on {{record.record_date}}
+    </p>
+    <p>
+        {{MEDIA_ROOT}}
+    </p>
+    <div class="container">
+        {% with 'data_record/'|add:record.index|add:'/bg.png' as image_static %}
+        <img src="{% static image_static %}" alt="blank image with rectangle" id="preview">
+        {% endwith %}
+        <div class="topleft">
+            <select id = "imgSelect" value="origin">
+                <option value ="origin">origin</option>
+                <option value ="blank">blank rect</option>
+                <option value="locations">locations</option>
+            </select>
+
+        </div>
+    </div>
+    <br>
+    <a href="{% url 'data_record:result' record.id %}"> Results </a>
+
+    {% else %}
+    <p>
+        No available data, check record name and dataset name.
+    </p>
+    {% endif %}
+
+</div>
+
+<script>
+ let imgSelect = document.getElementById('imgSelect');
+ imgSelect.addEventListener("change", changeImg);
+
+ function changeImg(){
+     let imgName = imgSelect.value;
+     let myImage = document.getElementById("preview");
+     let image_static;
+     if(imgName === 'origin') {
+         image_static = 'data_record/{{record.index}}Orig.bmp';
+     } else if(imgName === 'blank') {
+         image_static = 'data_record/{{record.index}}blank.png';
+     } else if(imgName === 'locations') {
+         image_static = 'data_record/{{record.index}}mask.png';
+     }
+     myImage.setAttribute('src', image_static);
+ }
+
+</script>
